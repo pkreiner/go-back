@@ -11,9 +11,9 @@ Then add the following lines:
 	(require 'go-back)
 	(global-set-key (kbd "M-r") 'go-back/pop-point-stack)
 
-or whatever keybinding you'd like. Then press M-r repeatedly to pop back through previous positions.
+or using keybinding you'd like. Then you just use go-back/pop-point-stack repeatedly to jump back through previous positions.
 
-If you do a sequence of pops, then interrupt it (e.g. with C-g), then start popping again, you'll be revisiting the revists, like emacs' undo.
+If you do a sequence of pops, then interrupt it (e.g. with C-g), then start popping again, you'll be revisiting the revisits, like emacs' undo.
 
 
 ## To Do
