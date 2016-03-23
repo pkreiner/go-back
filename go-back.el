@@ -28,22 +28,23 @@ go-back/pop-point-stack, this variable will have value n.")
 
 ;; Customizable variables
 
-(defvar go-back/point-stack-track-non-movement nil
+(defvar go-back/only-track-motions t
   "Controls whether positions will be stored even if the previous
 command didn't result in any movement. Feel free to customize.")
-(setq go-back/point-stack-track-non-movement nil)
+(setq go-back/only-track-motions t)
 
-(defvar go-back/point-stack-ignored-functions nil
-  "List of functions whose use should not push a new position to
+(defvar go-back/ignored-commands nil
+  "List of commands whose use should not push a new position to
   the stack, the idea being that maybe very small motions are not
   worth revisiting. Feel free to customize.")
-(setq go-back/point-stack-ignored-functions
+(setq go-back/ignored-commands
       '(
 	forward-char
 	backward-char
 	forward-word
 	backward-word
-      ))
+	self-insert-command
+	))
 
 
 ;; Internal functions
@@ -56,22 +57,26 @@ command didn't result in any movement. Feel free to customize.")
   "Pushes the current position to the point stack. Also manages
 an index variable that keeps track of how far down we are in a
 series of point-stack pops."
-  (go-back/push-to-point-stack)
+  (setq go-back/point-stack
+	(go-back/push-to-point-stack go-back/point-stack this-command))
   (if (eq this-command 'go-back/pop-point-stack)
       (setq go-back/point-stack-index (+ 1 go-back/point-stack-index))
     (setq go-back/point-stack-index 0)))
 	
 
-(defun go-back/push-to-point-stack ()
-  "If the point has moved, and the command wasn't in the list
-go-back/point-stack-ignored-functions, then push the new position to
-the stack."
-  ;; Initialize an empty stack
-  (if (null go-back/point-stack) (setq go-back/point-stack (list (point-marker)))
-    (unless (or (member this-command go-back/point-stack-ignored-functions)
-		(and go-back/point-stack-track-non-movement
-		     (equal (car go-back/point-stack) (point-marker))))
-      (setq go-back/point-stack (cons (point-marker) go-back/point-stack)))))
+(defun go-back/push-to-point-stack (stack command)
+  "Push the new position to the stack and return the result. If the
+last command was one of the go-back/ignored-commands, or the position
+didn't move and go-back/only-track-motions is turned on, then return
+the stack unchanged."
+  ;; If the stack is null, initialize it.
+  (if (null stack) (list (point-marker))
+    (if (or (member command go-back/ignored-commands)
+	    (and go-back/only-track-motions
+		 (equal (car stack) (point-marker))))
+	stack
+      (cons (point-marker) stack))))
+
 
 (defun go-back/pop-point-stack ()
   "Pop off the most recent position in go-back/point-stack."
@@ -87,6 +92,10 @@ the stack."
 (add-hook 'pre-command-hook 'go-back/manage-point-stack)
 ;; (remove-hook 'pre-command-hook 'go-back/manage-point-stack)
 
+;; This is for debugging, by displaying the contents of the stack in a
+;; buffer that's updated after every command.
+;; (add-hook 'post-command-hook 'print-stack)
+;; (remove-hook 'post-command-hook 'print-stack)
 
 ;; Helper functions
 
