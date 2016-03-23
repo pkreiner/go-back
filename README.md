@@ -16,6 +16,14 @@ or using any keybinding you'd like. Then you just use go-back/pop-point-stack re
 If you do a sequence of pops, then interrupt it (e.g. with C-g), then start popping again, you'll be revisiting the revisits, like emacs' undo.
 
 
-## To Do
-- Wrap everything in a minor mode.
+## Possible Improvements
+- Make this a minor mode, so it's easier to disable if it goes haywire.
+- Add a global history stack as well (currently each stack is buffer-local).
+- Make a way to jump back to only commands that resulted in an edit.
 
+
+## To Do
+
+
+## Issues
+- Fails when going back too far (600 steps on my machine). This is because one of the lookup functions (pop-nonzero-kth) is recursive and hits the recursion limit in elisp (which doesn't have tail-call recursion). Can fix by modifying the lookup slightly.
