@@ -16,6 +16,12 @@ or using any keybinding you'd like. Then you just use go-back/pop-point-stack re
 If you do a sequence of pops, then interrupt it (e.g. with C-g), then start popping again, you'll be revisiting the revisits, like emacs' undo.
 
 
+## Usage
+My main use case is, when coding, to jump to a definition somewhere else in the file, and then jump back using this package's 'go-back/pop-point-stack.
+
+In a big file, you might also enjoy winding through the recent history of where you've been reading and editing.
+
+
 ## Possible Improvements
 - Make this a minor mode, so it's easier to disable if it goes haywire.
 - Add a global history stack as well (currently each stack is buffer-local).
